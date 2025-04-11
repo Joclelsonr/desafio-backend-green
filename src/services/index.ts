@@ -1,5 +1,7 @@
 import { Boleto } from "@prisma/client";
 import { Prisma } from "../config/prisma";
+import { splitPDF } from "../utils/split-pdf";
+import { extractTextsFromPdf } from "../utils/pdf-text";
 
 export class Service {
   constructor(private prisma: Prisma) {}
@@ -25,5 +27,44 @@ export class Service {
       where: { nome: { endsWith: unit.padStart(4, "0") } },
     });
     return lot?.id;
+  };
+
+  public splitPDFIntoPages = async (filePath: string) => {
+    const pdfTexts = await extractTextsFromPdf(filePath);
+
+    const parsedSlips = this.parseSlipFromText(pdfTexts);
+
+    const ids = await Promise.all(
+      parsedSlips.map(async (slip) => {
+        const query = await this.getSlipByName(slip.nome_sacado);
+        return query?.id;
+      })
+    );
+
+    splitPDF(filePath, ids as number[]);
+    return "PDF imported successfully";
+  };
+
+  public getSlipByName = async (name: string) => {
+    const slip = await this.prisma.boleto.findFirst({
+      where: { nome_sacado: name },
+    });
+    return slip;
+  };
+
+  private parseSlipFromText = (text: string[]) => {
+    return text.map((text, index) => {
+      const nameMatch = text.match(/Nome:\s*(.+?)\s+Valor:/);
+      const valueMatch = text.match(/Valor:\s*R\$ ([\d.,]+)/);
+      const dueDate = text.match(/Vencimento:\s*([\d/]+)/);
+      return {
+        nome_sacado: nameMatch?.[1] || "",
+        valor: valueMatch
+          ? parseFloat(valueMatch[1].replace(".", "").replace(",", "."))
+          : 0,
+        vencimento: dueDate?.[1] || "",
+        position: index + 1,
+      };
+    });
   };
 }
