@@ -6,6 +6,27 @@ import { extractTextsFromPdf } from "../utils/pdf-text";
 export class Service {
   constructor(private prisma: Prisma) {}
 
+  public getAllBankSlips = async (
+    name?: string,
+    value_start?: string,
+    value_end?: string,
+    id_lot?: string,
+    order?: "asc" | "desc"
+  ) => {
+    const slips = await this.prisma.boleto.findMany({
+      where: {
+        nome_sacado: { contains: name },
+        valor: {
+          gte: value_start ? Number(value_start) : undefined,
+          lte: value_end ? Number(value_end) : undefined,
+        },
+        id_lote: { equals: id_lot ? Number(id_lot) : undefined },
+      },
+      orderBy: { id: order },
+    });
+    return slips;
+  };
+
   public saveSlip = async (data: Boleto[]) => {
     for (const item of data) {
       const id = await this.getLotByUnit(item.unidade);

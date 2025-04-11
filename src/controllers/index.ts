@@ -1,14 +1,33 @@
 import { Request, Response } from "express";
 import { Service } from "../services";
 import { parseCsv } from "../utils/csv-parser";
+import { generateReportPdf } from "../utils/generate-report-pdf";
 
 export class Controller {
   constructor(private service: Service) {}
 
   public bankSlip = async (req: Request, res: Response) => {
-    console.log("request", await req.params);
+    const { name, value_start, value_end, id_lot, report, order } = req.query;
+
     try {
-      res.status(200).json({ message: "Bank Slip" });
+      const result = await this.service.getAllBankSlips(
+        name as string,
+        value_start as string,
+        value_end as string,
+        id_lot as string,
+        order as "asc" | "desc" | undefined
+      );
+
+      if (report === "1") {
+        const base64 = await generateReportPdf(result);
+        // const pdfBuffer = await generateReportPdf(result);
+        // res.setHeader("Content-Type", "application/pdf");
+        // res.setHeader("Content-Disposition",'inline; filename="relatorio-boletos.pdf"');
+        // res.send(pdfBuffer);
+        res.status(200).json({ base64 });
+      }
+
+      res.status(200).json({ data: result });
     } catch (error: any) {
       res.status(500).json({ message: error.message });
     }
