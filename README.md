@@ -88,7 +88,7 @@ docker compose up -d
 5. Execute as migrações:
 
 ```bash
-npm rum migrate
+npm rum migrate && npm run seed
 ```
 
 6. Inicie o servidor:
