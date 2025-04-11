@@ -106,4 +106,4 @@ npm run dev
 
 ## 🧪 Testes
 
-Você pode usar o [Postman](https://documenter.getpostman.com/view/21551982/2sB2cYdfms) para testar os endpoints. Exemplos de payloads e arquivos estão na pasta `/samples`.
+Você pode usar o [Postman](https://documenter.getpostman.com/view/21551982/2sB2cYdfms) para testar os endpoints. Exemplos de payloads e coleções em `/samples` e arquivos para testes na pasta `/assets`.
