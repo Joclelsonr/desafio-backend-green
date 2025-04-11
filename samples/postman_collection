@@ -1,0 +1,160 @@
+{
+	"info": {
+		"_postman_id": "d43ca2f2-150a-4100-803e-2dba791da111",
+		"name": "Desafio Técnico Backend - Green",
+		"description": "Este é um projeto desenvolvido como parte de um **desafio técnico de backend**. Ele simula a integração entre dois sistemas de um condomínio residencial, importando arquivos `.csv` e `.pdf` de boletos do sistema financeiro para o sistema da portaria.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "21551982"
+	},
+	"item": [
+		{
+			"name": "Importat CSV",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "multipart/form-data",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": []
+						}
+					]
+				},
+				"url": {
+					"raw": "{{URL}}/import/csv",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"import",
+						"csv"
+					]
+				},
+				"description": "Endpoint que recebe um arquivo **.CSV** contendo os dados dos boletos. Os dados são transformados e inseridos na tabela `boletos`, realizando o mapeamento da unidade para o ID do lote."
+			},
+			"response": []
+		},
+		{
+			"name": "Importar PDF",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "multipart/form-data",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": []
+						}
+					]
+				},
+				"url": {
+					"raw": "{{URL}}/import/pdf",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"import",
+						"pdf"
+					]
+				},
+				"description": "Endpoint que recebe um .**PDF** com todos os boletos em páginas separadas. O sistema extrai os nomes de cada página usando `pdf-parse`, faz o mapeamento com os registros da base e salva os arquivos separadamente no disco, com o ID do lote no boleto."
+			},
+			"response": []
+		},
+		{
+			"name": "Boletos",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{URL}}/bank-slips",
+					"host": [
+						"{{URL}}"
+					],
+					"path": [
+						"bank-slips"
+					],
+					"query": [
+						{
+							"key": "name",
+							"value": "JOSE",
+							"disabled": true
+						},
+						{
+							"key": "value_start",
+							"value": "100",
+							"disabled": true
+						},
+						{
+							"key": "value_end",
+							"value": "200",
+							"disabled": true
+						},
+						{
+							"key": "id_lot",
+							"value": "2",
+							"disabled": true
+						},
+						{
+							"key": "order",
+							"value": "asc",
+							"disabled": true
+						},
+						{
+							"key": "report",
+							"value": "1",
+							"disabled": true
+						}
+					]
+				},
+				"description": "Endpoint para listar todos os boletos.\n\nFiltros:\n\n- `name`\n    \n- `value_start` e `value_end`\n    \n- `id_lot`\n    \n- `order`  \n    \n\nAo passar `report=1` na query string, o sistema retorna um relatório em PDF com os dados dos boletos filtrados. O PDF é gerado dinamicamente e retornado como `base64`."
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "URL",
+			"value": "http://localhost:3000",
+			"type": "string"
+		}
+	]
+}
